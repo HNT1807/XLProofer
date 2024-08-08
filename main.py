@@ -1811,7 +1811,10 @@ def create_marked_down_excel(file, results):
                     match = re.search(r'([A-Z]+)(\d+)', detail)
                     if match:
                         row = int(match.group(2))
-                        ws[f'{column_letter}{row}'].fill = orange_fill
+                        try:
+                            ws[f'{column_letter}{row}'].fill = orange_fill
+                        except ValueError as e:
+                            print(f"Error highlighting cell {column_letter}{row} for {field_name}: {str(e)}")
 
     # Highlight Category errors
     highlight_specific_field('Category')
@@ -1830,7 +1833,10 @@ def create_marked_down_excel(file, results):
             for detail in details:
                 cell_ids = re.findall(r'([A-Z]+\d+)', detail)
                 for cell_id in cell_ids:
-                    ws[cell_id].fill = orange_fill
+                    try:
+                        ws[cell_id].fill = orange_fill
+                    except ValueError as e:
+                        print(f"Error highlighting cell {cell_id} for {field}: {str(e)}")
 
     output = io.BytesIO()
     wb.save(output)
