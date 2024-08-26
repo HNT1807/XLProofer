@@ -1045,7 +1045,7 @@ def check_excel_file(file):
         "Viola", "Viola Da Gamba", "Violin", "Vocals", "Vocoder", "Washboard", "Waterphone",
         "Whip", "Whisper", "Whistle", "Whistle - Irish Low", "Whistle - Penny", "Whistle - Slide",
         "Whistle - Swanee", "Whistle - Tin", "Wind Chimes", "Wood Block", "Woodwinds", "Woodwinds - Ensemble",
-        "Woodwinds - Section", "Xiao", "Xylophone ", "Yangqin", "Zagat", "Zither", "Zourna/Sorna/Zurna"
+        "Woodwinds - Section", "Xiao", "Xylophone", "Yangqin", "Zagat", "Zither", "Zourna/Sorna/Zurna"
     ]
 
     if 'Instrumentation' in df.columns:
