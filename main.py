@@ -647,6 +647,56 @@ def check_excel_file(file):
     else:
         results['TrackTitle'] = '❌ <strong>TRACK TITLE OR FILENAME COLUMN NOT FOUND</strong>'
 
+    # Check Lyrics
+    if 'Lyrics' not in df.columns or 'Version' not in df.columns:
+        return '❌ <strong>LYRICS OR VERSION COLUMN NOT FOUND</strong>'
+
+    # Define bad words (same as VBA code)
+    bad_words = [
+        "shit", "bullshit", "shithead", "piss", "fuck", "cunt", "cocksucker", 
+        "motherfucker", "tits", "pussy", "asshole", "wog", "wop", "nigger", 
+        "kike", "gook", "faggot", "goddamn"
+    ]
+
+    # Initialize variables
+    explicit_cells = []
+    lyrics_col = df.columns.get_loc('Lyrics')
+    version_col = df.columns.get_loc('Version')
+    lyrics_letter = get_column_letter(lyrics_col + 1)
+    version_letter = get_column_letter(version_col + 1)
+    missing_explicit_marks = []
+    
+    # Check each cell in Lyrics column
+    for index, row in df.iterrows():
+        if pd.notna(row['Lyrics']):
+            lyrics_text = str(row['Lyrics']).lower()
+            contains_explicit = False
+            
+            # Check for bad words with word boundaries
+            for word in bad_words:
+                # Add spaces to start and end for boundary checking
+                padded_lyrics = f" {lyrics_text} "
+                word_pattern = rf'[.,;:!?()\[\]{{\}}| ]({word})[.,;:!?()\[\]{{\}}| ]'
+                if re.search(word_pattern, padded_lyrics):
+                    contains_explicit = True
+                    explicit_cells.append(f"{lyrics_letter}{index + 2}")
+                    break
+            
+            if contains_explicit:
+                # Check if Version contains "Explicit"
+                version_value = str(row['Version']) if pd.notna(row['Version']) else ""
+                if "Explicit" not in version_value:
+                    missing_explicit_marks.append(f"{version_letter}{index + 2}")
+
+    # Return appropriate message based on findings
+    if not explicit_cells:
+        return '✅ <strong>NO EXPLICIT LYRICS</strong>'
+    elif not missing_explicit_marks:
+        return '✅ <strong>EXPLICIT LYRICS PROPERLY MARKED</strong>'
+    else:
+        cells_list = ", ".join(missing_explicit_marks)
+        return f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing in cells: {cells_list}'
+        
     # Check Version
     if 'Version' in df.columns and 'Filename' in df.columns:
         version_col = df.columns.get_loc('Version')
@@ -672,6 +722,8 @@ def check_excel_file(file):
             results['Version'] = f'❌ <strong>VERSION</strong>|' + '|'.join(invalid_versions)
     else:
         results['Version'] = '❌ <strong>VERSION OR FILENAME COLUMN NOT FOUND</strong>'
+
+    
 
     # Check Version_Grouping
     if 'Version_Grouping' in df.columns and 'Version' in df.columns and 'Vocal' in df.columns and 'Filename' in df.columns:
@@ -1824,12 +1876,13 @@ def create_marked_down_excel(file, results):
     # Highlight Era errors
     highlight_specific_field('Era')
 
-    # Highlight other fields (if needed)
+   # Highlight other fields (if needed)
     for field in ['Filename', 'Description', 'Source', 'Volume', 'Duration', 'Library',
                   'CDTitle', 'Instrumentation', 'BPM', 'Tempo', 'LongID', 'SampleRate', 'TrackTitle', 'Version',
                   'Version_Grouping', 'Parent_Child', 'Composer Splits', 'Disk', 'Manufacturer',
                   'Track', 'Lyrics', 'TrackYear', 'LabelCode', 'Vocal', 'VocalType',
-                  'Composer Information', 'Publisher Information', 'SubCategory', 'Mood', 'Usage']:
+                  'Composer Information', 'Publisher Information', 'SubCategory', 'Mood', 'Usage',
+                  'Explicit Lyrics']:  # Added 'Explicit Lyrics' to the list
         if field in results and results[field].startswith('❌'):
             details = results[field].split('|')[1:]
             for detail in details:
