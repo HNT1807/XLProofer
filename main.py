@@ -610,6 +610,7 @@ def check_excel_file(file):
             results['SubCategory'] = f'❌ <strong>SUB-CATEGORY</strong>|' + '<br>'.join(invalid_subcategories)
     else:
         results['SubCategory'] = '❌ <strong>SUB-CATEGORY COLUMN NOT FOUND</strong>'
+        
     # Check CDTitle (assuming it should not be empty)
     if 'CDTitle' in df.columns:
         cdtitle_col = df.columns.get_loc('CDTitle')
@@ -625,6 +626,7 @@ def check_excel_file(file):
             results['CDTitle'] = f'❌ <strong>CD TITLE</strong>|' + '|'.join(invalid_cdtitles)
     else:
         results['CDTitle'] = '❌ <strong>CD TITLE COLUMN NOT FOUND</strong>'
+        
     # Check TrackTitle
     if 'TrackTitle' in df.columns and 'Filename' in df.columns:
         tracktitle_col = df.columns.get_loc('TrackTitle')
@@ -688,14 +690,16 @@ def check_excel_file(file):
                 if "Explicit" not in version_value:
                     missing_explicit_marks.append(f"{version_letter}{index + 2}")
 
-    # Return appropriate message based on findings
+    # Set the result in the results dictionary instead of returning
     if not explicit_cells:
-        return '✅ <strong>NO EXPLICIT LYRICS</strong>'
+        results['Explicit Lyrics'] = '✅ <strong>NO EXPLICIT LYRICS</strong>'
     elif not missing_explicit_marks:
-        return '✅ <strong>EXPLICIT LYRICS PROPERLY MARKED</strong>'
+        results['Explicit Lyrics'] = '✅ <strong>EXPLICIT LYRICS PROPERLY MARKED</strong>'
     else:
         cells_list = ", ".join(missing_explicit_marks)
-        return f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing in cells: {cells_list}'
+        results['Explicit Lyrics'] = f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing in cells: {cells_list}'
+
+    return results
         
     # Check Version
     if 'Version' in df.columns and 'Filename' in df.columns:
