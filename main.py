@@ -672,7 +672,7 @@ def check_excel_file(file):
     for index, row in df.iterrows():
         if pd.notna(row['Lyrics']):
             lyrics_text = str(row['Lyrics']).lower()
-            contains_explicit = False
+            found_words = set()  # Using set to avoid duplicate words
             
             # Check for bad words with word boundaries
             for word in bad_words:
@@ -680,24 +680,25 @@ def check_excel_file(file):
                 padded_lyrics = f" {lyrics_text} "
                 word_pattern = rf'[.,;:!?()\[\]{{\}}| ]({word})[.,;:!?()\[\]{{\}}| ]'
                 if re.search(word_pattern, padded_lyrics):
-                    contains_explicit = True
-                    explicit_cells.append(f"{lyrics_letter}{index + 2}")
-                    break
+                    found_words.add(word)
             
-            if contains_explicit:
+            if found_words:
+                contains_explicit = True
+                explicit_cells.append(f"{lyrics_letter}{index + 2} (found: {', '.join(found_words)})")
                 # Check if Version contains "Explicit"
                 version_value = str(row['Version']) if pd.notna(row['Version']) else ""
                 if "Explicit" not in version_value:
                     missing_explicit_marks.append(f"{version_letter}{index + 2}")
 
-    # Set the result in the results dictionary instead of returning
+    # Set the result in the results dictionary
     if not explicit_cells:
         results['Explicit Lyrics'] = '✅ <strong>NO EXPLICIT LYRICS</strong>'
     elif not missing_explicit_marks:
         results['Explicit Lyrics'] = '✅ <strong>EXPLICIT LYRICS PROPERLY MARKED</strong>'
     else:
         cells_list = ", ".join(missing_explicit_marks)
-        results['Explicit Lyrics'] = f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing in cells: {cells_list}'
+        words_found = " | ".join(explicit_cells)
+        results['Explicit Lyrics'] = f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing in cells: {cells_list}|Found explicit content in: {words_found}'
 
     return results
         
