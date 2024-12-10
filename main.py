@@ -1137,8 +1137,8 @@ def check_excel_file(file):
             'true life music': 'TLM',
             'promo accelerator': 'PA',
             'scoring stage': 'SS',
+            'glory fx': 'GFX',
             'ultimate crime & drama': 'UCD',
-            'ultimate crime and drama': 'UCD',  # Adding this variant
             'full tilt': 'FT',
             'glory, oath + blood': 'GOB',
             'gravity': 'GV',
