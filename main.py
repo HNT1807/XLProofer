@@ -879,39 +879,39 @@ def check_excel_file(file):
         results['CDTitle'] = '❌ <strong>CD TITLE COLUMN NOT FOUND</strong>'
 
     def check_composer_splits(df):
-    if 'Composer' not in df.columns:
-        return "❌ <strong>COMPOSER SPLITS</strong>|Composer column not found"
-
-    invalid_splits = []
-    composer_col = df.columns.get_loc('Composer')
-    composer_letter = openpyxl.utils.get_column_letter(composer_col + 1)
-
-    for index, row in df.iterrows():
-        if pd.notna(row['Composer']):
-            # Capture numbers with optional commas/decimals
-            percentages = re.findall(r'(\d+[,.]?\d*)%', row['Composer'])
-            if percentages:
-                total = 0
-                for p in percentages:
-                    # Replace commas with periods for conversion
-                    p_clean = p.replace(',', '.')
-                    try:
-                        total += float(p_clean)
-                    except ValueError:
-                        invalid_splits.append(f"Invalid percentage format in {composer_letter}{index + 2}: {p}%")
-                        total = -1  # Force an error
-                        break
-                if total == -1:
-                    continue  # Skip if there was an invalid format
-                if not (99.99 <= total <= 100.01):  # Account for floating point precision
-                    invalid_splits.append(f"The sum of {composer_letter}{index + 2} is {round(total)}%, should be 100%")
-            else:
-                invalid_splits.append(f"No percentages found in {composer_letter}{index + 2}")
-
-    if not invalid_splits:
-        return "✅ <strong>COMPOSER SPLITS</strong>"
-    else:
-        return f"❌ <strong>COMPOSER SPLITS</strong>|" + "|".join(invalid_splits)
+        if 'Composer' not in df.columns:
+            return "❌ <strong>COMPOSER SPLITS</strong>|Composer column not found"
+    
+        invalid_splits = []
+        composer_col = df.columns.get_loc('Composer')
+        composer_letter = openpyxl.utils.get_column_letter(composer_col + 1)
+    
+        for index, row in df.iterrows():
+            if pd.notna(row['Composer']):
+                # Capture numbers with optional commas/decimals
+                percentages = re.findall(r'(\d+[,.]?\d*)%', row['Composer'])
+                if percentages:
+                    total = 0
+                    for p in percentages:
+                        # Replace commas with periods for conversion
+                        p_clean = p.replace(',', '.')
+                        try:
+                            total += float(p_clean)
+                        except ValueError:
+                            invalid_splits.append(f"Invalid percentage format in {composer_letter}{index + 2}: {p}%")
+                            total = -1  # Force an error
+                            break
+                    if total == -1:
+                        continue  # Skip if there was an invalid format
+                    if not (99.99 <= total <= 100.01):  # Account for floating point precision
+                        invalid_splits.append(f"The sum of {composer_letter}{index + 2} is {round(total)}%, should be 100%")
+                else:
+                    invalid_splits.append(f"No percentages found in {composer_letter}{index + 2}")
+    
+        if not invalid_splits:
+            return "✅ <strong>COMPOSER SPLITS</strong>"
+        else:
+            return f"❌ <strong>COMPOSER SPLITS</strong>|" + "|".join(invalid_splits)
         
     def check_publisher_splits(df):
         if 'Publisher' not in df.columns:
