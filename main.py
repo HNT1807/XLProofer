@@ -1286,7 +1286,7 @@ def check_excel_file(file):
          results['TrackYear'] = '✅ <strong>TRACK YEAR</strong>'
      else:
          results['TrackYear'] = f'❌ <strong>TRACK YEAR</strong>|' + '|'.join(invalid_track_years)
-else:
+   else:
     results['TrackYear'] = '❌ <strong>TRACK YEAR column not found</strong>'
 
     
