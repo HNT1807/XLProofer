@@ -78,39 +78,39 @@ def check_excel_file(file):
         results[
             'Column Headers Order'] = f'❌ <strong>COLUMN HEADERS ORDER</strong>|Misplaced columns include: {misplaced_info}'
 
-        # Check for Unwanted Spaces
-        unwanted_spaces = []
-        for col_num, column in enumerate(df.columns, start=1):
-            for row_num, value in enumerate(df[column], start=2):
-                if isinstance(value, str):
-                    cell_id = f"{get_column_letter(col_num)}{row_num}"
-                    if ' ,' in value:
-                        unwanted_spaces.append(f"{cell_id} contains ' ,'")
-                    if ' .' in value:
-                        unwanted_spaces.append(f"{cell_id} contains ' .'")
-                    if ' )' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space before ')'")
-                    if '( ' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space after '('")
-                    if ' ]' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space before ']'")
-                    if ' |' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space before '|'".replace('|', '&#124;'))
-                    if '| ' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space after '|'".replace('|', '&#124;'))
-                    if '[ ' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a space after '['")
-                    if '  ' in value:
-                        unwanted_spaces.append(f"{cell_id} contains a double space")
-                    if value.startswith(' '):
-                        unwanted_spaces.append(f"{cell_id} has a leading space")
-                    if value.endswith(' '):
-                        unwanted_spaces.append(f"{cell_id} has a trailing space")
+    # Check for Unwanted Spaces
+    unwanted_spaces = []
+    for col_num, column in enumerate(df.columns, start=1):
+        for row_num, value in enumerate(df[column], start=2):
+            if isinstance(value, str):
+                cell_id = f"{get_column_letter(col_num)}{row_num}"
+                if ' ,' in value:
+                    unwanted_spaces.append(f"{cell_id} contains ' ,'")
+                if ' .' in value:
+                    unwanted_spaces.append(f"{cell_id} contains ' .'")
+                if ' )' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space before ')'")
+                if '( ' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space after '('")
+                if ' ]' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space before ']'")
+                if ' |' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space before '|'".replace('|', '&#124;'))
+                if '| ' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space after '|'".replace('|', '&#124;'))
+                if '[ ' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a space after '['")
+                if '  ' in value:
+                    unwanted_spaces.append(f"{cell_id} contains a double space")
+                if value.startswith(' '):
+                    unwanted_spaces.append(f"{cell_id} has a leading space")
+                if value.endswith(' '):
+                    unwanted_spaces.append(f"{cell_id} has a trailing space")
 
-        if not unwanted_spaces:
-            results['Unwanted Spaces'] = '✅ <strong>NO UNWANTED SPACES</strong>'
-        else:
-            results['Unwanted Spaces'] = f'❌ <strong>UNWANTED SPACES FOUND</strong>|' + '|'.join(unwanted_spaces)
+    if not unwanted_spaces:
+        results['Unwanted Spaces'] = '✅ <strong>NO UNWANTED SPACES</strong>'
+    else:
+        results['Unwanted Spaces'] = f'❌ <strong>UNWANTED SPACES FOUND</strong>|' + '|'.join(unwanted_spaces)
 
     # CHECK FILENAME
     if 'Filename' in df.columns:
