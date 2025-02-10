@@ -1267,21 +1267,33 @@ def check_excel_file(file):
     else:
         results['Lyrics'] = '❌ <strong>LYRICS OR VERSION_GROUPING COLUMN NOT FOUND</strong>'
 
+   
     # Check TRACK YEAR
     if 'TrackYear' in df.columns:
         track_year_col = df.columns.get_loc('TrackYear')
         track_year_letter = get_column_letter(track_year_col + 1)
         invalid_track_years = []
     
-        # Iterate through each row more robustly
+        # Iterate through each row
         for idx, row in df.iterrows():
-            # Check if the row has any non-null values (not entirely empty)
+            # Check if row has any non-empty values
             if not row.dropna().empty:
                 track_year = row['TrackYear']
-                # Handle NaN, empty strings, and zero values
-                if pd.isna(track_year) or (isinstance(track_year, str) and track_year.strip() == '') or track_year in [0, '0']:
+                
+                # Convert to string for consistent handling
+                str_track_year = str(track_year).strip() if isinstance(track_year, str) else track_year
+                
+                # Check for various invalid conditions
+                if (pd.isna(track_year) or 
+                    (isinstance(str_track_year, str) and str_track_year == '') or 
+                    (str_track_year in ['0', '0.0', 'nan', 'none']) or 
+                    (isinstance(track_year, (int, float)) and track_year == 0)):
+                    
                     invalid_track_years.append(f"{track_year_letter}{idx + 2} is missing track year")
     
+        # Add debug output
+        print(f"TrackYear validation results: {len(invalid_track_years)} issues found")
+        
         if not invalid_track_years:
             results['TrackYear'] = '✅ <strong>TRACK YEAR</strong>'
         else:
