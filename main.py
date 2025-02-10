@@ -1140,7 +1140,7 @@ def check_excel_file(file):
             'glory fx': 'GFX',
             'ultimate crime & drama': 'UCD',
             'full tilt': 'FT',
-            'glory, oath + blood': 'GOB',
+            'glory oath + blood': 'GOB',
             'gravity': 'GV',
             'groove addicts': 'GA',
             'hellscape': 'HEL',
