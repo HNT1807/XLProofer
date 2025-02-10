@@ -1269,25 +1269,25 @@ def check_excel_file(file):
 
     # Check TRACK YEAR
     if 'TrackYear' in df.columns:
-     track_year_col = df.columns.get_loc('TrackYear')
-     track_year_letter = get_column_letter(track_year_col + 1)
-     invalid_track_years = []
-
-    # Iterate through each row more robustly
-     for idx, row in df.iterrows():
-        # Check if the row has any non-null values (not entirely empty)
-         if not row.dropna().empty:
-             track_year = row['TrackYear']
-            # Handle NaN, empty strings, and zero values
-             if pd.isna(track_year) or (isinstance(track_year, str) and track_year.strip() == '') or track_year in [0, '0']:
-                 invalid_track_years.append(f"{track_year_letter}{idx + 2} is missing track year")
-
-     if not invalid_track_years:
-         results['TrackYear'] = '✅ <strong>TRACK YEAR</strong>'
-     else:
-         results['TrackYear'] = f'❌ <strong>TRACK YEAR</strong>|' + '|'.join(invalid_track_years)
-   else:
-    results['TrackYear'] = '❌ <strong>TRACK YEAR column not found</strong>'
+        track_year_col = df.columns.get_loc('TrackYear')
+        track_year_letter = get_column_letter(track_year_col + 1)
+        invalid_track_years = []
+    
+        # Iterate through each row more robustly
+        for idx, row in df.iterrows():
+            # Check if the row has any non-null values (not entirely empty)
+            if not row.dropna().empty:
+                track_year = row['TrackYear']
+                # Handle NaN, empty strings, and zero values
+                if pd.isna(track_year) or (isinstance(track_year, str) and track_year.strip() == '') or track_year in [0, '0']:
+                    invalid_track_years.append(f"{track_year_letter}{idx + 2} is missing track year")
+    
+        if not invalid_track_years:
+            results['TrackYear'] = '✅ <strong>TRACK YEAR</strong>'
+        else:
+            results['TrackYear'] = f'❌ <strong>TRACK YEAR</strong>|' + '|'.join(invalid_track_years)
+    else:
+        results['TrackYear'] = '❌ <strong>TRACK YEAR column not found</strong>'
 
     
     label_codes = {
