@@ -700,7 +700,7 @@ def check_excel_file(file):
         words_found = " | ".join(explicit_cells)
         results['Explicit Lyrics'] = f'❌ <strong>MISSING "EXPLICIT" IN VERSION COLUMN</strong>|Missing "Explicit" in cells: {cells_list}|Found explicit word in: {words_found}'
 
-    return results
+    
         
     # Check Version
     if 'Version' in df.columns and 'Filename' in df.columns:
