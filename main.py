@@ -1234,29 +1234,59 @@ def check_excel_file(file):
     else:
         results['Track'] = '❌ <strong>TRACK COLUMN NOT FOUND</strong>'
 
-    # Check TEMPO
-    valid_tempos = [
-        "Very Slow", "Slow", "Medium", "Medium Fast", "Fast", "Very Fast", "Variable",
-        "Variable/Speeds Up", "Variable/Slows Down", "No Tempo"
-    ]
+    # Define BPM ranges for each tempo
+tempo_ranges = {
+    "Very Slow": (0, 45),
+    "Slow": (46, 62),
+    "Medium": (63, 94),
+    "Medium Fast": (95, 129),
+    "Fast": (130, 159),
+    "Very Fast": (160, float('inf')),
+    "Variable": None,
+    "Variable/Speeds Up": None,
+    "Variable/Slows Down": None,
+    "No Tempo": None
+}
 
-    if 'Tempo' in df.columns:
-        tempo_col = df.columns.get_loc('Tempo')
-        tempo_letter = openpyxl.utils.get_column_letter(tempo_col + 1)
-        invalid_tempos = []
-        for index, cell in df['Tempo'].items():
-            if pd.notna(cell):
-                tempos = [tempo.strip() for tempo in str(cell).split(',')]
-                for tempo in tempos:
-                    if tempo not in valid_tempos:
-                        invalid_tempos.append(f"{tempo_letter}{index + 2} has an invalid option ('{tempo}')")
+# Check BPM and Tempo
+if 'BPM' in df.columns:
+    bpm_col = df.columns.get_loc('BPM')
+    bpm_letter = openpyxl.utils.get_column_letter(bpm_col + 1)
+    invalid_bpms = []
+    invalid_tempos = []
 
-        if not invalid_tempos:
+    for index, row in df.iterrows():
+        bpm = row['BPM']
+        tempo = row['Tempo'] if 'Tempo' in df.columns else None
+
+        # Check BPM
+        if pd.notna(bpm):
+            try:
+                bpm = int(bpm)
+                valid_tempo = None
+                for tempo_name, (min_bpm, max_bpm) in tempo_ranges.items():
+                    if min_bpm is not None and max_bpm is not None:
+                        if min_bpm <= bpm <= max_bpm:
+                            valid_tempo = tempo_name
+                            break
+                    else:
+                        valid_tempo = tempo_name  # For Variable/No Tempo
+
+                if tempo and tempo != valid_tempo:
+                    invalid_tempos.append(f"Row {index + 2}: Tempo '{tempo}' does not match BPM {bpm} (expected '{valid_tempo}')")
+            except ValueError:
+                invalid_bpms.append(f"{bpm_letter}{index + 2} has an invalid BPM value ('{bpm}')")
+
+    if not invalid_bpms and not invalid_tempos:
+        results['BPM'] = '✅ <strong>BPM</strong>'
+        if 'Tempo' in df.columns:
             results['Tempo'] = '✅ <strong>TEMPO</strong>'
-        else:
-            results['Tempo'] = f'❌ <strong>TEMPO</strong>|' + '|'.join(invalid_tempos)
     else:
-        results['Tempo'] = '❌ <strong>TEMPO COLUMN NOT FOUND</strong>'
+        results['BPM'] = f'❌ <strong>BPM</strong>|' + '|'.join(invalid_bpms)
+        if 'Tempo' in df.columns:
+            results['Tempo'] = f'❌ <strong>TEMPO</strong>|' + '|'.join(invalid_tempos)
+else:
+    results['BPM'] = '❌ <strong>BPM COLUMN NOT FOUND</strong>'
 
     # Check LYRICS
     if 'Lyrics' in df.columns and 'Version_Grouping' in df.columns:
