@@ -1181,8 +1181,7 @@ def check_excel_file(file):
                 disk_value = str(row['Disk']).replace('xxx', '').strip()  # Remove 'xxx' and strip whitespace
                 library_name = str(row['Library']).lower().strip()  # Convert to lowercase and strip whitespace
 
-                # Replace '&' with 'and' for consistency
-                library_name = library_name.replace('&', 'and')
+                
 
                 if library_name in library_initials:
                     expected_initial = library_initials[library_name]
