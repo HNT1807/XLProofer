@@ -1234,7 +1234,7 @@ def check_excel_file(file):
                         )
 
         if not invalid_disks:
-            results['Disk'] = '✅ Valid disk codes'
+            results['Disk'] = '✅ DISK'
         else:
             results['Disk'] = '❌ Issues found:<br>' + '<br>'.join(invalid_disks)
     else:
