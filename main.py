@@ -1180,8 +1180,7 @@ def check_excel_file(file):
     }
 }
 
-def validate_disk(df):
-    results = {}
+
     
     if 'Disk' in df.columns and 'Library' in df.columns:
         disk_col = df.columns.get_loc('Disk')
