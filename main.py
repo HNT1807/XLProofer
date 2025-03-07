@@ -1173,39 +1173,62 @@ def check_excel_file(file):
             'santa fe & 7th': 'SF7',
             'sounds from echo district': 'SFED',
             'story score': 'STY',
-            'scoremongers': 'SCM',
-            'scoremongers': 'SCMNA',
-            'scoremongers': 'SCMAS',
-            'scoremongers': 'SCMCS',
-            'scoremongers': 'SCMDS',
-            'scoremongers': 'SCMEH',
-            'scoremongers': 'SCMGS',
-            'scoremongers': 'SCMIS',
-            'scoremongers': 'SCMJZ',
-            'scoremongers': 'SCMLS',
-            'scoremongers': 'SCMMS',
-            'scoremongers': 'SCMNS',
-            'scoremongers': 'SCMPR',
-            'scoremongers': 'SCMPH',
-            'scoremongers': 'SCMSN',
-            'scoremongers': 'SCMTV'
+            'scoremongers': {
+        'base': 'SCM',
+        'subcodes': {
+            'NA', 'AS', 'CS', 'DS', 'EH', 'GS', 'IS', 
+            'JZ', 'LS', 'MS', 'NS', 'PR', 'PH', 'SN', 'TV'
         }
+    }
+}
 
-        for index, row in df[['Disk', 'Library']].iterrows():
-            if pd.notna(row['Disk']) and pd.notna(row['Library']):
-                disk_value = str(row['Disk']).replace('xxx', '').strip()  # Remove 'xxx' and strip whitespace
-                library_name = str(row['Library']).lower().strip()  # Convert to lowercase and strip whitespace
-
+# In your disk validation logic:
+for index, row in df[['Disk', 'Library']].iterrows():
+    if pd.notna(row['Disk']) and pd.notna(row['Library']):
+        disk_value = str(row['Disk']).replace('xxx', '').strip().upper()
+        library_name = str(row['Library']).lower().strip()
+        
+        if library_name == 'scoremongers':
+            # ScoreMongers validation rules
+            base = library_initials['scoremongers']['base']
+            valid_subcodes = library_initials['scoremongers']['subcodes']
+            
+            if not disk_value.startswith(base):
+                invalid_disks.append(f"{disk_letter}{index+2} '{disk_value}' must start with {base}")
+            else:
+                # Extract potential subcode (2 letters after base)
+                subcode = disk_value[len(base):len(base)+2]
+                remaining = disk_value[len(base):].lstrip(subcode)
                 
-
-                if library_name in library_initials:
-                    expected_initial = library_initials[library_name]
-                    if not (disk_value.upper().startswith(expected_initial) and
-                            (disk_value.upper() == expected_initial or disk_value[len(expected_initial):].isdigit())):
-                        invalid_disks.append(f"{disk_letter}{index + 2} '{disk_value}' should be '{expected_initial}'")
-                else:
+                # Validate structure
+                valid_structure = (
+                    len(disk_value) > len(base) and  # At least SCM + something
+                    (
+                        (subcode in valid_subcodes and remaining.isdigit()) or
+                        (subcode == '' and disk_value[len(base):].isdigit())
+                    )
+                )
+                
+                if not valid_structure:
+                    examples = "SCM123, SCMNA456, SCMTV789"
                     invalid_disks.append(
-                        f"{disk_letter}{index + 2} '{disk_value}' has an unknown library: '{row['Library']}'")
+                        f"{disk_letter}{index+2} '{disk_value}' invalid format. "
+                        f"Valid formats: {examples}"
+                    )
+        
+        else:
+            # Normal library validation
+            if library_name in library_initials:
+                expected_initial = library_initials[library_name]
+                if not (disk_value.startswith(expected_initial) and 
+                        disk_value[len(expected_initial):].isdigit()):
+                    invalid_disks.append(
+                        f"{disk_letter}{index+2} '{disk_value}' should start with {expected_initial}"
+                    )
+            else:
+                invalid_disks.append(
+                    f"{disk_letter}{index+2} Unknown library: '{library_name}'"
+                )
 
         if not invalid_disks:
             results['Disk'] = '✅ <strong>DISK</strong>'
