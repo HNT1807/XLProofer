@@ -1139,103 +1139,109 @@ def check_excel_file(file):
         invalid_disks = []
 
         library_initials = {
-            'wcbr music': 'WCBR',
-            '615 platinum series': 'SFL',
-            'kingsize': 'KSM',
-            'metro': 'MMP',
-            'true life music': 'TLM',
-            'promo accelerator': 'PA',
-            'scoring stage': 'SS',
-            'glory fx': 'GFX',
-            'ultimate crime & drama': 'UCD',
-            'full tilt': 'FT',
-            'glory oath + blood': 'GOB',
-            'gravity': 'GV',
-            'groove addicts': 'GA',
-            'hellscape': 'HEL',
-            'ignite': 'IG',
-            'mindbenders': 'MB',
-            'revolucion': 'NRV',
-            'who did that music': 'TL',
-            'attitude': 'ATUD',
-            'non-stop premier': 'NSPR',
-            'non-stop producer series': 'NSPS',
-            'naked music': 'NAKD',
-            'valo artists': 'VALO',
-            'valo latino': 'VALAT',
-            'xtortion audio': 'X',
-            'addicted noise': 'ADNM',
-            'big stuff': 'BST',
-            'cactus': 'CAC',
-            'elephant sound design': 'ELEP',
-            'elephant sound design - wild sanctuary biophonic': 'ELEWS',
-            'paralux': 'PLX',
-            'santa fe & 7th': 'SF7',
-            'sounds from echo district': 'SFED',
-            'story score': 'STY',
-            'scoremongers': {
-                'base': 'SCM',
-                'subcodes': {
-                    'NA', 'AS', 'CS', 'DS', 'EH', 'GS', 'IS', 
-                    'JZ', 'LS', 'MS', 'NS', 'PR', 'PH', 'SN', 'TV'
-                }
-            }
-            }
-            
-            # In your disk validation logic:
-            for index, row in df[['Disk', 'Library']].iterrows():
+    'wcbr music': 'WCBR',
+    '615 platinum series': 'SFL',
+    'kingsize': 'KSM',
+    'metro': 'MMP',
+    'true life music': 'TLM',
+    'promo accelerator': 'PA',
+    'scoring stage': 'SS',
+    'glory fx': 'GFX',
+    'ultimate crime & drama': 'UCD',
+    'full tilt': 'FT',
+    'glory oath + blood': 'GOB',
+    'gravity': 'GV',
+    'groove addicts': 'GA',
+    'hellscape': 'HEL',
+    'ignite': 'IG',
+    'mindbenders': 'MB',
+    'revolucion': 'NRV',
+    'who did that music': 'TL',
+    'attitude': 'ATUD',
+    'non-stop premier': 'NSPR',
+    'non-stop producer series': 'NSPS',
+    'naked music': 'NAKD',
+    'valo artists': 'VALO',
+    'valo latino': 'VALAT',
+    'xtortion audio': 'X',
+    'addicted noise': 'ADNM',
+    'big stuff': 'BST',
+    'cactus': 'CAC',
+    'elephant sound design': 'ELEP',
+    'elephant sound design - wild sanctuary biophonic': 'ELEWS',
+    'paralux': 'PLX',
+    'santa fe & 7th': 'SF7',
+    'sounds from echo district': 'SFED',
+    'story score': 'STY',
+    'scoremongers': {
+        'base': 'SCM',
+        'subcodes': {'NA', 'AS', 'CS', 'DS', 'EH', 'GS', 'IS', 
+                     'JZ', 'LS', 'MS', 'NS', 'PR', 'PH', 'SN', 'TV'}
+    }
+}
+
+def validate_disk(df):
+    results = {}
+    
+    if 'Disk' in df.columns and 'Library' in df.columns:
+        disk_col = df.columns.get_loc('Disk')
+        disk_letter = openpyxl.utils.get_column_letter(disk_col + 1)
+        invalid_disks = []
+
+        for index, row in df[['Disk', 'Library']].iterrows():
             if pd.notna(row['Disk']) and pd.notna(row['Library']):
                 disk_value = str(row['Disk']).replace('xxx', '').strip().upper()
                 library_name = str(row['Library']).lower().strip()
-                
+
+                # ScoreMongers special case
                 if library_name == 'scoremongers':
-                    # ScoreMongers validation rules
-                    base = library_initials['scoremongers']['base']
-                    valid_subcodes = library_initials['scoremongers']['subcodes']
+                    scm_config = library_initials['scoremongers']
+                    base = scm_config['base']
+                    valid_subcodes = scm_config['subcodes']
                     
                     if not disk_value.startswith(base):
-                        invalid_disks.append(f"{disk_letter}{index+2} '{disk_value}' must start with {base}")
-                    else:
-                        # Extract potential subcode (2 letters after base)
-                        subcode = disk_value[len(base):len(base)+2]
-                        remaining = disk_value[len(base):].lstrip(subcode)
-                        
-                        # Validate structure
-                        valid_structure = (
-                            len(disk_value) > len(base) and  # At least SCM + something
-                            (
-                                (subcode in valid_subcodes and remaining.isdigit()) or
-                                (subcode == '' and disk_value[len(base):].isdigit())
-                            )
+                        invalid_disks.append(
+                            f"{disk_letter}{index+2}: '{disk_value}' must start with {base}"
                         )
+                        continue
                         
-                        if not valid_structure:
-                            examples = "SCM123, SCMNA456, SCMTV789"
-                            invalid_disks.append(
-                                f"{disk_letter}{index+2} '{disk_value}' invalid format. "
-                                f"Valid formats: {examples}"
-                            )
+                    # Check for valid subcode format
+                    remaining = disk_value[len(base):]
+                    has_subcode = len(remaining) >= 2 and remaining[:2] in valid_subcodes
+                    numbers_part = remaining[2:] if has_subcode else remaining
+                    
+                    if not numbers_part.isdigit():
+                        examples = "SCM123, SCMTV456, SCMNA789"
+                        invalid_disks.append(
+                            f"{disk_letter}{index+2}: '{disk_value}' invalid. Valid formats: {examples}"
+                        )
+                    elif has_subcode and not remaining[:2] in valid_subcodes:
+                        invalid_disks.append(
+                            f"{disk_letter}{index+2}: '{disk_value}' invalid subcode. Valid subcodes: {', '.join(valid_subcodes)}"
+                        )
                 
+                # Other libraries
                 else:
-                    # Normal library validation
                     if library_name in library_initials:
-                        expected_initial = library_initials[library_name]
-                        if not (disk_value.startswith(expected_initial) and 
-                                disk_value[len(expected_initial):].isdigit()):
+                        expected_init = library_initials[library_name]
+                        if not (disk_value.startswith(expected_init) and 
+                                disk_value[len(expected_init):].isdigit()):
                             invalid_disks.append(
-                                f"{disk_letter}{index+2} '{disk_value}' should start with {expected_initial}"
+                                f"{disk_letter}{index+2}: '{disk_value}' should start with {expected_init}"
                             )
                     else:
                         invalid_disks.append(
-                            f"{disk_letter}{index+2} Unknown library: '{library_name}'"
+                            f"{disk_letter}{index+2}: Unknown library '{row['Library']}'"
                         )
 
         if not invalid_disks:
-            results['Disk'] = '✅ <strong>DISK</strong>'
+            results['Disk'] = '✅ Valid disk codes'
         else:
-            results['Disk'] = f'❌ <strong>DISK</strong>|' + '|'.join(invalid_disks)
+            results['Disk'] = '❌ Issues found:<br>' + '<br>'.join(invalid_disks)
     else:
-        results['Disk'] = '❌ <strong>DISK OR LIBRARY COLUMN NOT FOUND</strong>'
+        results['Disk'] = '❌ Missing Disk or Library columns'
+    
+   
 
     # Check Track
     if 'Track' in df.columns:
