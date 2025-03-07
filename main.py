@@ -1173,7 +1173,22 @@ def check_excel_file(file):
             'santa fe & 7th': 'SF7',
             'sounds from echo district': 'SFED',
             'story score': 'STY',
-            'scoremongers': 'SCM'
+            'scoremongers': 'SCM',
+            'scoremongers': 'SCMNA',
+            'scoremongers': 'SCMAS',
+            'scoremongers': 'SCMCS',
+            'scoremongers': 'SCMDS',
+            'scoremongers': 'SCMEH',
+            'scoremongers': 'SCMGS',
+            'scoremongers': 'SCMIS',
+            'scoremongers': 'SCMJZ',
+            'scoremongers': 'SCMLS',
+            'scoremongers': 'SCMMS',
+            'scoremongers': 'SCMNS',
+            'scoremongers': 'SCMPR',
+            'scoremongers': 'SCMPH',
+            'scoremongers': 'SCMSN',
+            'scoremongers': 'SCMTV'
         }
 
         for index, row in df[['Disk', 'Library']].iterrows():
