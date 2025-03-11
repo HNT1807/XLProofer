@@ -269,7 +269,7 @@ def check_excel_file(file):
         "NON-STOP PREMIER", "NON-STOP PRODUCER SERIES", "NAKED MUSIC", "VALO ARTISTS", "VALO LATINO",
         "XPLCT MUZIK", "XTORTION AUDIO", "ADDICTED NOISE", "BIG STUFF", "CACTUS",
         "ELEPHANT SOUND DESIGN", "ELEPHANT SOUND DESIGN - WILD SANCTUARY BIOPHONIC", "PARALUX",
-        "SANTA FE & 7TH", "SOUNDS FROM ECHO DISTRICT", "STORY SCORE", "SCOREMONGERS", "GLORY FX", "CATALYST"
+        "SANTA FE & 7TH", "SOUNDS FROM ECHO DISTRICT", "STORY SCORE", "SCOREMONGERS", "GLORY FX", "CATALYST MUSIC"
     ]
 
     if 'Library' in df.columns:
@@ -1172,7 +1172,7 @@ def check_excel_file(file):
     'paralux': 'PLX',
     'santa fe & 7th': 'SF7',
     'sounds from echo district': 'SFED',
-    'catalyst': 'CTL',
+    'catalyst music': 'CTL',
     'story score': 'STY',
     'scoremongers': {
         'base': 'SCM',
