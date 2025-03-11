@@ -1172,6 +1172,7 @@ def check_excel_file(file):
     'paralux': 'PLX',
     'santa fe & 7th': 'SF7',
     'sounds from echo district': 'SFED',
+    'catalyst': 'CTL',
     'story score': 'STY',
     'scoremongers': {
         'base': 'SCM',
