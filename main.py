@@ -936,8 +936,10 @@ def check_excel_file(file):
         else:
             return f"❌ <strong>PUBLISHER SPLITS</strong>|" + "|".join(invalid_splits)
 
-    # Add these to your main check_excel_file function
+    
+    results['Composer Splits'] = check_composer_splits(df)
     results['Publisher Splits'] = check_publisher_splits(df)
+    
     # Check Manufacturer
     if 'Manufacturer' in df.columns:
         manufacturer_col = df.columns.get_loc('Manufacturer')
